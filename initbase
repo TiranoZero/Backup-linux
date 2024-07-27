@@ -1,28 +1,51 @@
 #!/usr/bin/env bash
-apt update && apt upgrade -y
-apt install python3 -y
-pip install discord pillow flask
-apt install git
-git clone https://github.com/TiranoZero/Aula-Termux-Discord.py.git
-apt install wget
-apt install figlet
 
-mv Aula-Termux-Discord.py base
-mv base/removivel.vimrc ~/.vimrc
-mkdir -p  ~/.vim/colors
+function utility(){
+        apt update && apt upgrade -y
+        apt install python3 -y
+        pip install discord pillow flask
+        apt install git
+        apt install wget                                           apt install figlet
+        apt install dialog
+}
 
-mv base/monokai.vim ~/.vim/colors
+function set_vim(){
+        git clone https://github.com/TiranoZero/Aula-Termux-Discord.py.git
+        mv -v Aula-Termux-Discord.py/ base/
+        mv -v  ~/base/removivel.vimrc ~/.vimrc
+        mkdir -v -p  ~/.vim/colors
+        mv -v ~/base/monokai.vim ~/.vim/colors
+        rm -v -r base
+}
 
-adduser lord
+function user_no_root(){
+        adduser lord
 
-rm  -r base
-vim .bashrc
-
-data=$(dialog --inputbox 'Digite o novo hostname' 10 31 --stdout)
+}
 
 
-echo "\n127.0.0.1 $data" >> /etc/hosts
-echo "$data" > /etc/hostname
-echo "$data" > /proc/sys/kernel/hostname
 
-$(dialog --msgbox "Instalação completa, sua maquina vai reiniciar")
+
+function set_hostname(){
+        data=$(dialog --inputbox 'Digite o novo hostname' 10 31 --stdout)
+
+
+        echo "127.0.0.1 $data" >> /etc/hosts
+        echo "$data" > /etc/hostname
+        echo "$data" > /proc/sys/kernel/hostname
+
+        dialog --msgbox "Reconfiguração completa, sua maquina vai reiniciar para aplicar alterações" 10 31
+}
+
+function Runner(){
+        utility
+        set_vim
+    if [ whoami == "root" ] then
+        user_no_root
+    fi
+        vim .bashrc
+        set_hostname
+
+}
+
+Runner
